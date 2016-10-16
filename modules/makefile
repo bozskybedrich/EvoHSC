@@ -46,8 +46,6 @@ clean:
 ${program}: ${OBJ}
 	ar cr ${outDir}/${program} ${OBJ}
 
-${tmpDir}/adder.o ${tmpDir}/bit_shift.o ${tmpDir}/ComparatorModule.o ${tmpDir}/ConstantModule.o ${tmpDir}/MaxInputModule.o ${tmpDir}/MedianModule.o ${tmpDir}/module.o ${tmpDir}/Multiplexer.o ${tmpDir}/multiplier.o ${tmpDir}/PixelEvaluator.o ${tmpDir}/PixelInput.o
-
 ${tmpDir}/adder.o: ../modules/adder.cpp ../modules/adder.h
 	gcc ../modules/adder.cpp -c ${OPT} -o ${tmpDir}/adder.o
 
