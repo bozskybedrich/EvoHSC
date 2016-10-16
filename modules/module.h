@@ -1,7 +1,7 @@
 #pragma once
 
-#include "typedefs.h"
-#include "errorstatus.h"
+#include "../simulator/typedefs.h"
+#include "../simulator/errorstatus.h"
 
 #define ZERO_FLAG_MASK	0x01
 #define SIGN_FLAG_MASK	0x02
