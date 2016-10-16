@@ -46,8 +46,8 @@ clean:
 ${program}: ${OBJ}
 	ar cr ${outDir}/${program} ${OBJ}
 
-${tmpDir}/adder.o: adder.cpp adder.h
-	gcc adder.cpp -c ${OPT} -o ${tmpDir}/adder.o
+${tmpDir}/adder.o: ../modules/adder.cpp ../modules/adder.h
+	gcc ../modules/adder.cpp -c ${OPT} -o ${tmpDir}/adder.o
 
 ${tmpDir}/architecture.o: architecture.cpp architecture.h
 	gcc architecture.cpp -c ${OPT} -o ${tmpDir}/architecture.o
@@ -61,11 +61,11 @@ ${tmpDir}/instrdecoder.o: instrdecoder.cpp instrdecoder.h
 ${tmpDir}/main.o: main.cpp
 	gcc main.cpp -c ${OPT} -o ${tmpDir}/main.o
 
-${tmpDir}/module.o: module.cpp module.h
-	gcc module.cpp -c ${OPT} -o ${tmpDir}/module.o
+${tmpDir}/module.o: ../modules/module.cpp ../modules/module.h
+	gcc ../modules/module.cpp -c ${OPT} -o ${tmpDir}/module.o
 
-${tmpDir}/multiplier.o: multiplier.cpp multiplier.h
-	gcc multiplier.cpp -c ${OPT} -o ${tmpDir}/multiplier.o
+${tmpDir}/multiplier.o: ../modules/multiplier.cpp ../modules/multiplier.h
+	gcc ../modules/multiplier.cpp -c ${OPT} -o ${tmpDir}/multiplier.o
 
 ${tmpDir}/simulator.o: simulator.cpp simulator.h
 	gcc simulator.cpp -c ${OPT} -o ${tmpDir}/simulator.o
