@@ -45,7 +45,7 @@ clean:
 	gzip c17.tar
 
 ${program}: ${OBJ}
-	gcc maximum.cpp ${OPT} ${OPT_LINKER} -o ${outDir}/${program}
+	gcc ${OBJ} ${OPT} ${OPT_LINKER} -o ${outDir}/${program}
 #	gcc ${OBJ} ${OPT} ${OPT_LINKER} -o ${outDir}/${program}
 
 ${tmpDir}/maximum.o: maximum.cpp
