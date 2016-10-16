@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "modules.h"
+#include "../modules/modules.h"
 
 #define	IMAGE_COUNT	1
 #define	IMAGE_WIDTH	64
