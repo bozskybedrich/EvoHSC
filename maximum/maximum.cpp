@@ -6,7 +6,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "modules.h"
+#include "../modules/modules.h"
 
 #define SAMPLES_COUNT	8
 #define TEST_SETS_COUNT	10
