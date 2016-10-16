@@ -51,8 +51,8 @@ ${program}: ${OBJ}
 ${tmpDir}/maximum.o: maximum.cpp
 	gcc maximum.cpp -c ${OPT} -o ${tmpDir}/maximum.o
 
-${tmpDir}/MaxInputModule.o: MaxInputModule.cpp
-	gcc MaxInputModule.cpp -c ${OPT} -o ${tmpDir}/MaxInputModule.o
+${tmpDir}/MaxInputModule.o: ../modules/MaxInputModule.cpp
+	gcc ../modules/MaxInputModule.cpp -c ${OPT} -o ${tmpDir}/MaxInputModule.o
 
-${tmpDir}/ComparatorModule.o: ComparatorModule.cpp
-	gcc ComparatorModule.cpp -c ${OPT} -o ${tmpDir}/ComparatorModule.o
+${tmpDir}/ComparatorModule.o: ../modules/ComparatorModule.cpp
+	gcc ../modules/ComparatorModule.cpp -c ${OPT} -o ${tmpDir}/ComparatorModule.o
