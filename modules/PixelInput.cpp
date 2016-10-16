@@ -1,7 +1,7 @@
 #include "PixelInput.h"
 
 CPixelInputModule::CPixelInputModule(REGISTER_TYPE ** pInputs, int nInsCount, int nIndex, int nTestSetsCount, int * pActTestSet)
-	: CMaxInputModule(pInputs, nInsCount, &m_nIndex, nTestSetsCount, pActTestSet), m_nIndex(nIndex)
+	: CMaxInputModule(pInputs, nInsCount, &nIndex, nTestSetsCount, pActTestSet), m_nIndex(nIndex)
 {
 	m_nInputCount = 0;
 	m_nOutputCount = 2;
