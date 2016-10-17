@@ -77,6 +77,13 @@ double CIndividual::EvaluateFitness(strSimulationParams & simParams)
 
 	assert(nActTestSet == 0);
 
+	// Just print the execution order of instructions (for better readability)
+	if (simParams.bPrintDebug)
+	{
+		m_pArch->ExecuteProgram(m_pFirstInstr, m_pEnv, simParams.nMaxLogicTime, nExecTime, true);
+		return 0;
+	}
+
 	do {
 		m_pArch->ExecuteProgram(m_pFirstInstr, m_pEnv, simParams.nMaxLogicTime, nExecTime);
 		m_mapFitness[eResultsFitness] += EvaluateOutputs(m_pEnv);

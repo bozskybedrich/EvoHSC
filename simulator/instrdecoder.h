@@ -33,7 +33,7 @@ public:
 	~CInstrExecInfo();
 	UINT GetModsCount() { return m_nModsCount; }
 	CModExecInfo * GetModExecInfo(UINT nIndex);
-	int Execute(REGISTER_TYPE * pTmpRegisters, bool * pTmpRegistersUsed, UINT & nInstrExecDelay);
+	int Execute(REGISTER_TYPE * pTmpRegisters, bool * pTmpRegistersUsed, UINT & nInstrExecDelay, bool bPrintDebug = false);
 protected:
 	UINT m_nModsCount;
 	CModExecInfo ** m_pModsExecOrder;
@@ -49,9 +49,9 @@ public:
 
 	// Decodes current instruction, sets the connections 
 	// and returns the address of the next instruction
-	int DecodeAndExecute(void * pInstrAddr, DWORD nModulesMask, int * nOffset, UINT * pActLogicTime, CEnvironment * pEnvironment);
+	int DecodeAndExecute(void * pInstrAddr, DWORD nModulesMask, int * nOffset, UINT * pActLogicTime, CEnvironment * pEnvironment, bool bPrintDebug = false);
 	int ExecuteProgram(void * pFirstInstr, UINT nProgramSize, CEnvironment * pEnvironment, UINT nMaxLogTime);
-	int Execute(CInstrBlock * pFirstInstr, CEnvironment * pEnvironment, UINT nMaxLogTime, UINT & nExecTime);
+	int Execute(CInstrBlock * pFirstInstr, CEnvironment * pEnvironment, UINT nMaxLogTime, UINT & nExecTime, bool bPrintDebug = false);
 	UINT GetModuleIndex(DWORD nHeader);
 
 protected:

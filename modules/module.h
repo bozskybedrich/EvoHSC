@@ -2,6 +2,7 @@
 
 #include "../simulator/typedefs.h"
 #include "../simulator/errorstatus.h"
+#include <string>
 
 #define ZERO_FLAG_MASK	0x01
 #define SIGN_FLAG_MASK	0x02
@@ -16,6 +17,7 @@ public:
 	UINT GetOutputsCount();
 	virtual UINT GetArea();
 	virtual UINT GetPrice();
+	virtual std::string GetLabel() { return "MOD"; }
 	inline void SetZero(bool bIsZero)
 		{
 			if (bIsZero)

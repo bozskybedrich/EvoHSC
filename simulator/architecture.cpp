@@ -431,12 +431,12 @@ void CArchitecture::ResetModules()
 		m_pModules[i]->ResetFlags();
 }
 
-int CArchitecture::ExecuteProgram(CInstrBlock * pFirstInstr, CEnvironment * pEnvironment, UINT nMaxLogTime, UINT & nExecTime)
+int CArchitecture::ExecuteProgram(CInstrBlock * pFirstInstr, CEnvironment * pEnvironment, UINT nMaxLogTime, UINT & nExecTime, bool bPrintDebug)
 {
 	ResetRegisters();
 	ResetModules();
 	CInstructionDecoder decoder(this);
-	return decoder.Execute(pFirstInstr, pEnvironment, nMaxLogTime, nExecTime);
+	return decoder.Execute(pFirstInstr, pEnvironment, nMaxLogTime, nExecTime, bPrintDebug);
 }
 
 CInstruction * CArchitecture::GetInstruction(BYTE nInstrCode)
