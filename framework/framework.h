@@ -36,9 +36,10 @@ struct strCrossoverParams {
 };
 
 struct strSimulationParams {
-	strSimulationParams(UINT nMaxTime = DEF_SIMUL_MAX_TIME) : nMaxLogicTime(nMaxTime), bPrintInfo(false) {}
+	strSimulationParams(UINT nMaxTime = DEF_SIMUL_MAX_TIME) : nMaxLogicTime(nMaxTime), bPrintInfo(false), bPrintDebug(false) {}
 	UINT nMaxLogicTime;
 	bool bPrintInfo;
+	bool bPrintDebug;
 };
 
 struct strSelectionParams {

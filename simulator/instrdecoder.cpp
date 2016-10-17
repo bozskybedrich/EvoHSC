@@ -19,7 +19,7 @@ CInstructionDecoder::~CInstructionDecoder()
 {
 }
 
-int CInstructionDecoder::DecodeAndExecute(void * pInstrAddr, DWORD nModulesMask, int * nOffset, UINT * pActLogicTime, CEnvironment * pEnvironment)
+int CInstructionDecoder::DecodeAndExecute(void * pInstrAddr, DWORD nModulesMask, int * nOffset, UINT * pActLogicTime, CEnvironment * pEnvironment, bool bPrintDebug)
 {
 	void * pOrigInstr = pInstrAddr;
 	assert(m_pArchitecture);
@@ -155,7 +155,7 @@ int CInstructionDecoder::DecodeAndExecute(void * pInstrAddr, DWORD nModulesMask,
 
 	UINT nInstrExecDelay = 0;
 	CInstrExecInfo instrExecInfo(nMods, nModulesMask, m_pArchitecture, (BYTE *) pInstrAddr);
-	instrExecInfo.Execute(pTmpRegisters, pTmpRegisterUsed, nInstrExecDelay);
+	instrExecInfo.Execute(pTmpRegisters, pTmpRegisterUsed, nInstrExecDelay, bPrintDebug);
 
 	if (nInstrExecDelay > nExecutionDelay)
 		nExecutionDelay = nInstrExecDelay;
@@ -268,19 +268,32 @@ int CInstructionDecoder::ExecuteProgram(void * pFirstInstr, UINT nProgramSize, C
 	return ERR_SUCCESS;
 }
 
-int CInstructionDecoder::Execute(CInstrBlock * pFirstInstr, CEnvironment * pEnvironment, UINT nMaxLogTime, UINT & nExecTime)
+int CInstructionDecoder::Execute(CInstrBlock * pFirstInstr, CEnvironment * pEnvironment, UINT nMaxLogTime, UINT & nExecTime, bool bPrintDebug)
 {
 	UINT nActLogicTime = 0;
 	
 	CInstrBlock * pActInstr = pFirstInstr;
 	while (pActInstr && (nActLogicTime < nMaxLogTime)) {
+		if (bPrintDebug)
+			std::cout << "------------------------------------------------------------------------" << std::endl;
+
 		bool bJump = false;
 		for (UINT nInstrIndex = 0; nInstrIndex < pActInstr->GetInstrCount(); nInstrIndex++) {
+			if (bPrintDebug)
+			{
+				UINT nInstrNo = pActInstr->GetInstrNo(nInstrIndex);
+				CInstruction * pInstr = m_pArchitecture->GetInstruction(nInstrNo);
+				if (pInstr->IsParametric())
+					std::cout << pInstr->GetDescription() << " " << pActInstr->GetParam(nInstrIndex) << std::endl;
+				else
+					std::cout << pInstr->GetDescription() << std::endl;
+			}
+
 			// Get the instruction expanded form in new array for execution
 			BYTE * pDecoded = m_pArchitecture->GetDecoded(pActInstr, nInstrIndex);
 			DWORD nModulesMask = pActInstr->GetModulesMask();
 			int errCode = 0, nOffset = 0;
-			if ((errCode = DecodeAndExecute(pDecoded, nModulesMask, &nOffset, &nActLogicTime, pEnvironment)) != ERR_SUCCESS)
+			if ((errCode = DecodeAndExecute(pDecoded, nModulesMask, &nOffset, &nActLogicTime, pEnvironment, bPrintDebug)) != ERR_SUCCESS)
 				return errCode;
 
 			// Process the result of jump instruction
@@ -423,8 +436,11 @@ CModExecInfo * CInstrExecInfo::GetModExecInfo(UINT nIndex)
 	}
 }
 
-int CInstrExecInfo::Execute(REGISTER_TYPE * pTmpRegisters, bool * pTmpRegistersUsed, UINT & nInstrExecDelay)
+int CInstrExecInfo::Execute(REGISTER_TYPE * pTmpRegisters, bool * pTmpRegistersUsed, UINT & nInstrExecDelay, bool bPrintDebug)
 {
+	//if (bPrintDebug)
+	//	std::cout << "------------------------------------------------------------------------" << std::endl;
+
 	// Fill current register values to the array of possible module inputs
 	UINT nCurrPossibleMax = m_pArchitecture->GetRegistersCount();
 	UINT nMaxModuleDelay = 0;
@@ -438,17 +454,36 @@ int CInstrExecInfo::Execute(REGISTER_TYPE * pTmpRegisters, bool * pTmpRegistersU
 		CModule * pMod = pModExecInfo->GetModule();
 		UINT nMaxInputDelay = 0;
 
+		if (bPrintDebug)
+			std::cout << pMod->GetLabel() << " (index: " << nMod << ")" << std::endl;
+
 		// Create and fill inputs
 		UINT nInsCount = pMod->GetInputsCount();
 		REGISTER_TYPE * pInputs = new REGISTER_TYPE[nInsCount];
 		for (UINT nInput = 0; nInput < nInsCount; nInput++) {
+			if (bPrintDebug)
+				std::cout << "in" << nInput << ":";
+
 			UINT nIndex = pModExecInfo->GetInputIndex(nInput);
 			
 			if ((nIndex & 0x80) != 0 && nIndex != 0xFF)
+			{
 					pInputs[nInput] = (nIndex & 0x7F);
+					if (bPrintDebug)
+						std::cout << "const=" << pInputs[nInput] << " ";
+			}
 			else {
 				nIndex = nIndex % nCurrPossibleMax;
 				pInputs[nInput] = m_pPossibleInputs[nIndex].value;
+
+				if (bPrintDebug)
+				{
+					if (nIndex < m_pArchitecture->GetRegistersCount())
+						std::cout << "reg" << nIndex << " ";
+					else
+						std::cout << "out" << nIndex << " ";
+				}
+
 				if (m_pPossibleInputs[nIndex].nDelay > nMaxInputDelay)
 					nMaxInputDelay = m_pPossibleInputs[nIndex].nDelay;
 			}
@@ -472,12 +507,19 @@ int CInstrExecInfo::Execute(REGISTER_TYPE * pTmpRegisters, bool * pTmpRegistersU
 		// Fill output values to temporary registers
 		for (UINT nCurrentOutput = 0; nCurrentOutput < nOutsCount; nCurrentOutput++) {
 			BYTE outputIndex = pModExecInfo->GetOutputIndex(nCurrentOutput);
+			
+			if (bPrintDebug)
+				std::cout << "out" << nCurrPossibleMax << " ";
+
 			// 0xFF value is used if the module output should not be transferred to register
 			if (outputIndex != 0xFF) {
 				outputIndex %= m_pArchitecture->GetRegistersCount();
 				//assert(pTmpRegistersUsed[outputIndex] == false);
 				pTmpRegisters[outputIndex] = pOutputs[nCurrentOutput];
 				pTmpRegistersUsed[outputIndex] = true;
+
+				if (bPrintDebug)
+					std::cout << "-> reg" << (int) outputIndex << " ";
 			}
 			
 			// Fill output to the array of possible inputs
@@ -485,6 +527,9 @@ int CInstrExecInfo::Execute(REGISTER_TYPE * pTmpRegisters, bool * pTmpRegistersU
 			m_pPossibleInputs[nCurrPossibleMax].nDelay = nModDelay;
 			nCurrPossibleMax++;
 		}
+
+		if (bPrintDebug)
+			std::cout << std::endl;
 
 		delete[] pInputs;
 		delete[] pOutputs;

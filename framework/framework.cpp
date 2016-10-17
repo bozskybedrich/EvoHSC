@@ -324,6 +324,10 @@ void CFramework::StartEvolution()
 	}
 
 	for (UINT nBest = 0; nBest < m_strEvoParams.nEliteSize; nBest++) {
+		m_strEvoParams.strSimulParams.bPrintDebug = true;
+		m_pBestIndivs[0]->EvaluateFitness(m_strEvoParams.strSimulParams);
+		m_strEvoParams.strSimulParams.bPrintDebug = false;
+
 		std::cout << m_pBestIndivs[nBest]->GetFitness(eResultsFitness) << " ";
 		std::cout << m_pBestIndivs[nBest]->GetFitness(eAreaFitness) << " ";
 		std::cout << m_pBestIndivs[nBest]->GetFitness(eSpeedFitness) << " ";

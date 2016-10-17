@@ -7,6 +7,7 @@ public:
 	CMaxInputModule(REGISTER_TYPE ** pInputs, int nInsCount, int * pActIn, int nTestSetsCount, int * pActTestSet);
 	virtual int Execute(REGISTER_TYPE * pInputs, REGISTER_TYPE * pOutputs, UINT * pExecDelay = NULL);
 	UINT GetArea() { return 20; }
+	virtual std::string GetLabel() { return "MAX_IN"; }
 	void SetDefZero(bool bZero) { m_bSetZero = bZero; }
 	void SetDefSign(bool bSign) { m_bSetSign = bSign; }
 protected:

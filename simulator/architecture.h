@@ -146,7 +146,7 @@ public:
 	CModule * GetModule(UINT nModIndex);
 	CModule * GetModuleByTopologyOrder(UINT nModIndex);
 	UINT GetModulesCount();
-	int ExecuteProgram(CInstrBlock * pFirstInstr, CEnvironment * pEnvironment, UINT nMaxLogTime, UINT & nExecTime);
+	int ExecuteProgram(CInstrBlock * pFirstInstr, CEnvironment * pEnvironment, UINT nMaxLogTime, UINT & nExecTime, bool bPrintDebug = false);
 	CInstruction * GetInstruction(BYTE nInstrCode);
 	UINT GetInstructionCount();
 	BYTE * GetDecoded(CInstrBlock * pBlock, UINT nInstrIndex);

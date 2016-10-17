@@ -622,7 +622,7 @@ bool CImageFilterFramework::EvaluateStopCondition(UINT nGeneration)
 					m_pBestIndivs[nBest]->EvaluateFitness(m_strEvoParams.strSimulParams);
 					m_strEvoParams.strSimulParams.bPrintInfo = false;
 					char outFile[50];
-					sprintf(outFile,"result_raw_%d.raw", clock());
+					sprintf(outFile, "result_raw_%d.raw", clock());
 					SaveRawImage(outFile, 62, 62, pTmpImage);
 					//system("PAUSE");
 				}
