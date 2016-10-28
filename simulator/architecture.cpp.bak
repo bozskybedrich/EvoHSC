@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <iomanip>
 //#include <crtdbg.h>
 
 #ifdef _DEBUG
@@ -112,12 +111,6 @@ CInstrBlock::CInstrBlock(CInstrBlock * pSourceBlock, CInstrBlock * pInsertAfter,
 		m_vecIOs.push_back(pIOs);
 	}
 
-	InsertAfter(pInsertAfter);
-}
-
-CInstrBlock::CInstrBlock(TiXmlElement * pInstrElem, CInstrBlock * pInsertAfter)
-{
-	Parse(pInstrElem);
 	InsertAfter(pInsertAfter);
 }
 
@@ -235,75 +228,6 @@ bool CInstrBlock::SetIO(UINT nInstrIndex, UINT nIOIndex, BYTE nIOValue)
 	}
 }
 
-std::string CInstrBlock::Serialize(CArchitecture * pArch)
-{
-	std::stringstream sXml;
-	sXml << "<instr modMask=\"" << m_nModulesMask << "\">";
-
-	std::vector<UINT>::iterator itMicInst;
-	std::vector<REGISTER_TYPE>::iterator itParam;
-	std::vector<BYTE*>::iterator itIOs;
-
-	for (itMicInst = m_vecInstrNo.begin(), itParam = m_vecParam.begin(), itIOs = m_vecIOs.begin(); 
-		itMicInst != m_vecInstrNo.end() && itParam != m_vecParam.end() && itIOs != m_vecIOs.end(); 
-		itMicInst++, itParam++, itIOs++)
-	{
-		CInstruction * pInst = pArch->GetInstruction(*itMicInst);
-		UINT nIOCount = pInst->GetInsOutsCount();
-		sXml << "<micInst instNo=\"" << *itMicInst << "\" param=\"" << *itParam << "\"><ios size=\"" << nIOCount << "\">";
-		for (BYTE * pActIO = (*itIOs); pActIO - (*itIOs) < nIOCount; pActIO++)
-			sXml << std::setfill('0') << std::setw(2) << std::hex << (int) *pActIO << " ";
-		sXml << "</ios></micInst>";
-	}
-	sXml << "</instr>";
-
-	return sXml.str();
-}
-
-bool CInstrBlock::Parse(TiXmlElement * pInstrBlockElem)
-{
-	m_nModulesMask = atoi(pInstrBlockElem->Attribute("modMask"));
-	for (TiXmlElement * pMicInst = pInstrBlockElem->FirstChildElement("micInst"); pMicInst; pMicInst = pMicInst->NextSiblingElement("micInst"))
-	{
-		UINT nInstrNo = atoi(pMicInst->Attribute("instNo"));
-		REGISTER_TYPE param = atoi(pMicInst->Attribute("param"));
-
-		TiXmlElement * pIO = pMicInst->FirstChildElement("ios");
-		UINT nIOSize = atoi(pIO->Attribute("size"));
-		BYTE * pIOs = NULL;
-
-		if (nIOSize > 0)
-		{
-			pIOs = new BYTE[nIOSize];
-			std::string sIOs = pIO->GetText();
-			std::stringstream sIOstream(sIOs);
-
-			int nIO = 0;
-			for (int i = 0; i < nIOSize; i++)
-			{
-				sIOstream >> std::hex >> nIO;
-				pIOs[i] = nIO;
-			}
-		}
-
-		m_vecInstrNo.push_back(nInstrNo);
-		m_vecParam.push_back(param);
-		m_vecIOs.push_back(pIOs);
-	}
-
-	return true;
-}
-
-std::string strArchitectureParams::Serialize()
-{
-	return "";
-}
-
-bool strArchitectureParams::Parse(TiXmlElement * pArchParamElem)
-{
-	return false;
-}
-
 strArchitectureSettings::strArchitectureSettings(UINT nModulesCount)
 	: nModCount(nModulesCount), pModulesOrder(NULL), pModulesInverseOrder(NULL)
 {
@@ -321,46 +245,10 @@ strArchitectureSettings::strArchitectureSettings(const strArchitectureSettings &
 	memcpy(pModulesInverseOrder, source.pModulesInverseOrder, nModCount*sizeof(UINT));
 }
 
-strArchitectureSettings::strArchitectureSettings(TiXmlElement * pArchSettElem)
-{
-	Parse(pArchSettElem);
-}
-
 strArchitectureSettings::~strArchitectureSettings()
 {
 	delete[] pModulesOrder;
 	delete[] pModulesInverseOrder;
-}
-
-std::string strArchitectureSettings::Serialize()
-{
-	std::stringstream sXml, sModOrder, sInvOrder;
-	sXml << "<archSettings modCount=\"" << nModCount << "\">";
-	for (int i = 0; i < nModCount; i++)
-	{
-		sModOrder << "<ord ind=\"" << i << "\" ord=\"" << pModulesOrder[i] << "\" invOrd=\"" << pModulesInverseOrder[i] << "\" />";
-	}
-	sXml << sModOrder.str();
-	sXml << "</archSettings>";
-
-	return sXml.str();
-}
-
-bool strArchitectureSettings::Parse(TiXmlElement * pArchSettElem)
-{
-	nModCount = atoi(pArchSettElem->Attribute("modCount"));
-
-	pModulesOrder = new UINT[nModCount];
-	pModulesInverseOrder = new UINT[nModCount];
-
-	for (TiXmlElement * pOrd = pArchSettElem->FirstChildElement("ord"); pOrd; pOrd = pOrd->NextSiblingElement("ord"))
-	{
-		UINT nIndex = atoi(pOrd->Attribute("ind"));
-		pModulesOrder[nIndex] = atoi(pOrd->Attribute("ord"));
-		pModulesInverseOrder[nIndex] = atoi(pOrd->Attribute("invOrd"));
-	}
-
-	return true;
 }
 
 CArchitecture::CArchitecture(UINT nRegCount, REGISTER_TYPE nDefRegMask, UINT nModCount, CModule ** pMods, UINT nInstrCount, CInstruction ** pInstrSet, strArchitectureParams * pStrParams, bool bDynamic)
@@ -625,14 +513,4 @@ void CArchitecture::SetModuleUsed(UINT nInd, bool bUsed)
 	else {
 		m_pModulesUsed[nInd] = bUsed;
 	}
-}
-
-std::string CArchitecture::Serialize()
-{
-	return "";
-}
-
-bool CArchitecture::Parse(TiXmlElement * pArchElem)
-{
-	return false;
 }

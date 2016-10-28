@@ -43,7 +43,6 @@ class CIndividual {
 public:
 	CIndividual(const CIndividual & source);
 	CIndividual(CArchitecture * pArch, CEnvironment * pEnv, CFramework * pFramework, strIndividualParams * pIndivParams);
-	CIndividual(std::string & sXml, CArchitecture * pArch, CEnvironment * pEnv, CFramework * pFramework, strArchitectureParams * pArchParams = NULL);
 	virtual ~CIndividual();
 	virtual bool LessThan(const CIndividual & other) const {
 		return m_strNsgaII < other.m_strNsgaII;
@@ -78,8 +77,6 @@ public:
 	virtual strArchitectureSettings * GetArchSettings() { return m_pArchSettings; }
 	virtual void SetArchitectureSettings(strArchitectureSettings * pSettings) { m_pArchSettings = pSettings; }
 	std::map<enumFitnessType, double> & GetFitnessMap() { return m_mapFitness; }
-	std::string Serialize();
-	bool Parse(std::string sXml);
 protected:
 	CArchitecture * m_pArch;
 

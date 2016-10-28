@@ -69,23 +69,6 @@ struct strEvolutionParams {
 struct strIndividualParams {
 	strIndividualParams(UINT nProgSize, UINT nJmpOffset = MAX_JUMP_OFFSET, UINT nRandParam = MAX_RAND_NUM) 
 		: nMaxProgramSize(nProgSize), nMaxJmpOffset(nJmpOffset), nMaxRandParam(nRandParam) {}
-
-	std::string Serialize()
-	{
-		std::stringstream sXml;
-		sXml << "<indivParams maxProgSize=\"" << nMaxProgramSize << "\" maxJmpOffset=\"" << nMaxJmpOffset << "\" maxRandParam=\"" << nMaxRandParam << "\" />";
-		return sXml.str();
-	}
-
-	bool Parse(TiXmlElement * pIndivParams)
-	{
-		nMaxProgramSize = atoi(pIndivParams->Attribute("maxProgSize"));
-		nMaxJmpOffset = atoi(pIndivParams->Attribute("maxJmpOffset"));
-		nMaxRandParam = atoi(pIndivParams->Attribute("maxRandParam"));
-
-		return true;
-	}
-
 	UINT nMaxProgramSize;
 	UINT nMaxJmpOffset;
 	UINT nMaxRandParam;

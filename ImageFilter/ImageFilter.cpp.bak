@@ -4,8 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include "modules.h"
-#include <fstream>
+#include "../modules/modules.h"
 
 #define	IMAGE_COUNT	1
 #define	IMAGE_WIDTH	64
@@ -623,13 +622,8 @@ bool CImageFilterFramework::EvaluateStopCondition(UINT nGeneration)
 					m_pBestIndivs[nBest]->EvaluateFitness(m_strEvoParams.strSimulParams);
 					m_strEvoParams.strSimulParams.bPrintInfo = false;
 					char outFile[50];
-					sprintf(outFile, "result_raw_%X.raw", clock());
+					sprintf(outFile, "result_raw_%d.raw", clock());
 					SaveRawImage(outFile, 62, 62, pTmpImage);
-					sprintf(outFile, "indiv_out_%X.xml", clock());
-					std::ofstream outIndiv(outFile, std::ofstream::binary);
-					std::string sXml = m_pBestIndivs[nBest]->Serialize();
-					outIndiv.write(sXml.c_str(), sXml.length());
-					outIndiv.close();
 					//system("PAUSE");
 				}
 			

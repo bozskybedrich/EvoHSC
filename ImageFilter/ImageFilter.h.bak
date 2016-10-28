@@ -13,8 +13,6 @@ public:
 	//CSymRegIndiv(strArchitectureParams * pParams, CEnvironment * pEnv);
 	CImageFilterIndiv(CArchitecture * pArch, CEnvironment * pEnv, CFramework * pFramework, strIndividualParams * pIndivParams)
 		: CIndividual(pArch, pEnv, pFramework, pIndivParams) {}
-	CImageFilterIndiv(std::string & sXml, CArchitecture * pArch, CEnvironment * pEnv, CFramework * pFramework, strArchitectureParams * pArchParams = NULL)
-		: CIndividual(sXml, pArch, pEnv, pFramework, pArchParams) {}
 	CImageFilterIndiv * Clone() { return new CImageFilterIndiv(*this); }
 
 	double EvaluateOutputs(CEnvironment * pEnv);

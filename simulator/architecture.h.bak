@@ -5,7 +5,6 @@
 #include "environment.h"
 #include <string>
 #include <vector>
-#include "../tinyxml/tinyxml.h"
 
 typedef enum {
 	INST_JMP,
@@ -55,7 +54,6 @@ public:
 	CInstrBlock(UINT nInstrNo, REGISTER_TYPE param, CInstrBlock * pInsertAfter, BYTE * pIOs, DWORD nModulesMask); // Create instruction using the given parameters and position
 	CInstrBlock(CInstrBlock * pInsertAfter); // Create random instruction
 	CInstrBlock(CInstrBlock * pSourceBlock, CInstrBlock * pInsertAfter, CArchitecture * pArch);
-	CInstrBlock(TiXmlElement * pInstrElem, CInstrBlock * pInsertAfter);
 	~CInstrBlock();
 	
 	// Get functions
@@ -94,8 +92,6 @@ public:
 		return pRet;
 	}
 
-	std::string Serialize(CArchitecture * pArch);
-	bool Parse(TiXmlElement * pInstrBlockElem);
 protected:
 	std::vector<UINT> m_vecInstrNo;
 	std::vector<REGISTER_TYPE> m_vecParam;
@@ -115,9 +111,6 @@ struct strArchitectureParams {
 		nMaxInstructionCount(0),
 		pAllowedInstructions(NULL) {}
 
-	std::string Serialize();
-	bool Parse(TiXmlElement * pArchParamElem);
-
 	UINT nMaxRegistersCount;
 	REGISTER_TYPE * pRegistersMaxWidths;
 	UINT nMaxModulesCount;
@@ -129,11 +122,7 @@ struct strArchitectureParams {
 struct strArchitectureSettings {
 	strArchitectureSettings(const strArchitectureSettings & source);
 	strArchitectureSettings(UINT nModulesCount);
-	strArchitectureSettings(TiXmlElement * pArchSettElem);
 	~strArchitectureSettings();
-	
-	std::string Serialize();
-	bool Parse(TiXmlElement * pArchSettElem);
 
 	UINT nModCount;
 	UINT * pModulesOrder;
@@ -171,10 +160,7 @@ public:
 	void SetModuleUsed(UINT nInd, bool bUsed);
 	REGISTER_TYPE GetDefRegMask() { return m_nDefRegMask; }
 	UINT GetMaxPossibleInputs() { return m_nMaxPossibleInputs; }
-	
-	std::string Serialize();
-	bool Parse(TiXmlElement * pArchElem);
-	
+
 protected:
 	UINT m_nRegistersCount;
 	REGISTER_TYPE * m_pRegisterMasks;

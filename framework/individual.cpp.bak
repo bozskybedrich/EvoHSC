@@ -50,20 +50,6 @@ CIndividual::CIndividual(CArchitecture * pArch, CEnvironment * pEnv, CFramework 
 		m_pArch = pArch;
 }
 
-CIndividual::CIndividual(std::string & sXml, CArchitecture * pArch, CEnvironment * pEnv, CFramework * pFramework, strArchitectureParams * pArchParams)
-	: m_pEnv(pEnv), m_pFramework(pFramework), m_pArchParams(pArchParams)
-{
-	assert(pArch);
-	assert(pEnv);
-
-	if (pArch->IsDynamic())
-		m_pArch = new CArchitecture(*pArch);
-	else
-		m_pArch = pArch;
-
-	Parse(sXml);
-}
-
 CIndividual::~CIndividual()
 {
 	CInstrBlock * pActInstr = m_pFirstInstr, * pNextInstr;
@@ -654,62 +640,4 @@ CInstrBlock * CIndividual::GetInstrBlockByPos(UINT nPos)
 	}
 
 	return pBlock;
-}
-
-std::string CIndividual::Serialize()
-{
-	std::stringstream sXml;
-	sXml << "<individual>";
-	sXml << m_pArchSettings->Serialize();
-	sXml << m_pIndivParams->Serialize();
-	sXml << "<program instrCount=\"" << m_nInstrCount << "\">";
-	for (CInstrBlock * pActInstr = m_pFirstInstr; pActInstr; pActInstr = pActInstr->GetNext())
-	{
-		sXml << pActInstr->Serialize(m_pArch);
-	}
-	sXml << "</program></individual>";
-
-	return sXml.str();
-}
-
-bool CIndividual::Parse(std::string sXml)
-{
-	TiXmlDocument doc;
-	doc.Parse(sXml.c_str());
-	if (doc.Error())
-		return false;
-
-	TiXmlElement * pIndivElem = doc.RootElement();
-	if (!pIndivElem)
-		return false;
-
-	TiXmlElement * pArchSettElem = pIndivElem->FirstChildElement("archSettings");
-	if (!pArchSettElem)
-		return false;
-	m_pArchSettings = new strArchitectureSettings(pArchSettElem);
-	
-	TiXmlElement * pIndivParamsElem = pIndivElem->FirstChildElement("indivParams");
-	if (!pIndivParamsElem)
-		return false;
-	m_pIndivParams = new strIndividualParams(0);
-	if (!m_pIndivParams->Parse(pIndivParamsElem))
-		return false;
-
-	TiXmlElement * pProgElem = pIndivElem->FirstChildElement("program");
-	if (!pProgElem)
-		return false;
-
-	m_nInstrCount = atoi(pProgElem->Attribute("instrCount"));
-	CInstrBlock * pPrevInstr = NULL;
-	for (TiXmlElement * pInstrElem = pProgElem->FirstChildElement("instr"); pInstrElem; pInstrElem = pInstrElem->NextSiblingElement("instr"))
-	{
-		CInstrBlock * pCurrInstr = new CInstrBlock(pInstrElem, pPrevInstr);
-		if (!pPrevInstr)
-			m_pFirstInstr = pCurrInstr;
-		pPrevInstr = pCurrInstr;
-	}
-
-	m_pLastInstr = pPrevInstr;
-
-	return true;
 }
