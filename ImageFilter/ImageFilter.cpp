@@ -204,8 +204,8 @@ void GenerateIOs(REGISTER_TYPE ** &pInputs, REGISTER_TYPE ** &pOutputs, int & nS
 	BYTE *pOrigImageHeader = NULL, *pOrigImage = NULL;
 	DWORD dwOrigOffset = 0, dwOrigWidth = 0, dwOrigHeight = 0;
 
-	LoadBmp(std::string("C:\\vutbr\\lena_salt_64.bmp"), &pTestImageHeader, &pTestImage, dwTestOffset, dwTestWidth, dwTestHeight);
-	LoadBmp(std::string("C:\\vutbr\\lena64.bmp"), &pOrigImageHeader, &pOrigImage, dwOrigOffset, dwOrigWidth, dwOrigHeight);
+	LoadBmp(std::string("../lena_salt_64.bmp"), &pTestImageHeader, &pTestImage, dwTestOffset, dwTestWidth, dwTestHeight);
+	LoadBmp(std::string("../lena64.bmp"), &pOrigImageHeader, &pOrigImage, dwOrigOffset, dwOrigWidth, dwOrigHeight);
 
 	//SaveRawImage("C:\\vutbr\\lena_raw.raw", dwOrigWidth, dwOrigHeight, pOrigImage);
 
