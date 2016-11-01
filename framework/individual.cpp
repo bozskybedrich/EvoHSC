@@ -90,16 +90,13 @@ double CIndividual::EvaluateFitness(strSimulationParams & simParams)
 	m_mapFitness[ePriceFitness] = 0;
 
 	assert(nActTestSet == 0);
-
-	// Just print the execution order of instructions (for better readability)
-	if (simParams.bPrintDebug)
-	{
-		m_pArch->ExecuteProgram(m_pFirstInstr, m_pEnv, simParams.nMaxLogicTime, nExecTime, true);
-		return 0;
-	}
+	
+	bool bFirst = true;
 
 	do {
-		m_pArch->ExecuteProgram(m_pFirstInstr, m_pEnv, simParams.nMaxLogicTime, nExecTime);
+		// Print the execution order of instructions at first execution (for better readability)
+		m_pArch->ExecuteProgram(m_pFirstInstr, m_pEnv, simParams.nMaxLogicTime, nExecTime, simParams.bPrintDebug && bFirst);
+		bFirst = false;
 		m_mapFitness[eResultsFitness] += EvaluateOutputs(m_pEnv);
 		m_mapFitness[eSpeedFitness] += EvaluateSpeed(nExecTime, simParams.nMaxLogicTime);
 		EvaluateHW();

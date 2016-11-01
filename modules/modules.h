@@ -11,3 +11,5 @@
 #include "Multiplexer.h"
 #include "PixelEvaluator.h"
 #include "PixelInput.h"
+#include "SigmoidInput.h"
+#include "AndOr.h"

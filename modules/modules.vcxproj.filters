@@ -54,6 +54,12 @@
     <ClInclude Include="PixelInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SigmoidInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AndOr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="adder.cpp">
@@ -87,6 +93,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PixelInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SigmoidInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AndOr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
