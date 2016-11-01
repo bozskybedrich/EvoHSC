@@ -4,7 +4,7 @@ tmpDir=temp
 program=libmodules.a
 
 # Seznam objektových souboru použijeme na dvou místech.
-OBJ=${tmpDir}/adder.o ${tmpDir}/bit_shift.o ${tmpDir}/ComparatorModule.o ${tmpDir}/ConstantModule.o ${tmpDir}/MaxInputModule.o ${tmpDir}/MedianModule.o ${tmpDir}/module.o ${tmpDir}/Multiplexer.o ${tmpDir}/multiplier.o ${tmpDir}/PixelEvaluator.o ${tmpDir}/PixelInput.o
+OBJ=${tmpDir}/adder.o ${tmpDir}/bit_shift.o ${tmpDir}/ComparatorModule.o ${tmpDir}/ConstantModule.o ${tmpDir}/MaxInputModule.o ${tmpDir}/MedianModule.o ${tmpDir}/module.o ${tmpDir}/Multiplexer.o ${tmpDir}/multiplier.o ${tmpDir}/PixelEvaluator.o ${tmpDir}/PixelInput.o ${tmpDir}/AndOr.o ${tmpDir}/SigmoidInput.o
 
 # Míra optimalizace prekladace gcc
 #OPT=-I ../tinyxml -ggdb3 -m32
@@ -78,3 +78,9 @@ ${tmpDir}/PixelEvaluator.o: ../modules/PixelEvaluator.cpp ../modules/PixelEvalua
 
 ${tmpDir}/PixelInput.o: ../modules/PixelInput.cpp ../modules/PixelInput.h
 	gcc ../modules/PixelInput.cpp -c ${OPT} -o ${tmpDir}/PixelInput.o
+
+${tmpDir}/AndOr.o: ../modules/AndOr.cpp ../modules/AndOr.h
+	gcc ../modules/AndOr.cpp -c ${OPT} -o ${tmpDir}/AndOr.o
+
+${tmpDir}/SigmoidInput.o: ../modules/SigmoidInput.cpp ../modules/SigmoidInput.h
+	gcc ../modules/SigmoidInput.cpp -c ${OPT} -o ${tmpDir}/SigmoidInput.o
