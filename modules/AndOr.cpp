@@ -13,7 +13,7 @@ CAndOr::CAndOr(UINT nInputsCount) :
 	CModule()
 {
 	m_nInputCount = nInputsCount + 1;
-	m_nOutputCount = 1;
+	m_nOutputCount = 2;
 }
 
 int CAndOr::Execute(REGISTER_TYPE * pInputs, REGISTER_TYPE * pOutputs, UINT * pExecDelay)
@@ -31,6 +31,8 @@ int CAndOr::Execute(REGISTER_TYPE * pInputs, REGISTER_TYPE * pOutputs, UINT * pE
 			break;
 		}
 	}
+
+	pOutputs[1] = ~pOutputs[0];
 
 	SetZero(pOutputs[0] == 0);
 	SetSign(pOutputs[0] < 0);

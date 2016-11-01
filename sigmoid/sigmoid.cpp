@@ -57,10 +57,10 @@ void GenerateIOs(REGISTER_TYPE ** &pInputs, REGISTER_TYPE ** &pOutputs, int & nS
 	pOutputs = new REGISTER_TYPE*[SAMPLES_COUNT];
 	pOutputs[0] = new REGISTER_TYPE[OUTPUTS_COUNT];
 	pOutputs[0][0] = 0xFFFFFE00;
-	pOutputs[0][1] = 0xFFFF01E0;
-	pOutputs[0][2] = 0xFFC0F198;
-	pOutputs[0][3] = 0xF038C954;
-	pOutputs[0][4] = 0xE36ACFE;
+	pOutputs[0][1] = 0xFFFF01F0;
+	pOutputs[0][2] = 0xFFE0F18C;
+	pOutputs[0][3] = 0xFC1CCD6A;
+	pOutputs[0][4] = 0xC39AE9C0;
 }
 
 void test(double fCross, double fMut)
@@ -75,15 +75,21 @@ void test(double fCross, double fMut)
 	}
 
 	for (int i = 0; i < (MODULES_COUNT - INPUTS_COUNT); i++)
-		pModules[INPUTS_COUNT + i] = new CAndOr(4);
+		pModules[INPUTS_COUNT + i] = new CAndOr(2);
 
 	CEnvironment * pEnv = new CEnvironment(NULL, NULL, 1, 1, NULL);
 	
-	BYTE instModAll[] = {0x00, 0x00, 0x00, 0x7F};
+	BYTE instModAll[] = {0x00, 0x00, 0x1F, 0xFF};
 
-	BYTE iosModAll[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Input modules
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, //ANDOR modules (9 ins - 8 inputs, 1 fn select, 1 out)
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF/*,
+	BYTE iosModAll[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Input modules
+		0xFF, 0xFF, 0xC2, 0xFF, 0xFF, //ANDOR modules (x inputs, 1 fn select, 1 out)
+		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xC2, 0xFF, 0xFF/*,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
@@ -146,17 +152,17 @@ void test(double fCross, double fMut)
 									new CInstruction(4, instrNOP, false, std::string("NOP")),
 									new CInstruction(4, instrRST, false, std::string("RST")),
 									
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 17)
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50)
 	};
 	
 	strArchitectureParams archParams;
@@ -217,11 +223,11 @@ double CSigmoidIndiv::EvaluateOutputs(CEnvironment * pEnv)
 
 	for (std::vector<REGISTER_TYPE>::iterator itOut = vecOuts.begin(); itOut != vecOuts.end(); itOut++)
 	{
-		if (*itOut == pOutputs[0][3/*itOut - vecOuts.begin()*/])
+		if (*itOut == pOutputs[0][0/*itOut - vecOuts.begin()*/])
 			dFitness += 100.0;
 		else
 		{
-			REGISTER_TYPE masked = (*itOut ^ pOutputs[0][3/*itOut - vecOuts.begin()*/]);
+			REGISTER_TYPE masked = (*itOut ^ pOutputs[0][0/*itOut - vecOuts.begin()*/]);
 			int nCorrectBits = 0;
 			int nBitWidth = sizeof(REGISTER_TYPE)*8;
 
@@ -233,9 +239,11 @@ double CSigmoidIndiv::EvaluateOutputs(CEnvironment * pEnv)
 				masked >>= 1;
 			}
 
-			if (nCorrectBits > 28)
-				dFitness += 10.0;
-			else
+			//if ((*itOut & 0x100) != 0)
+			//	nCorrectBits -= 5;
+			//if (nCorrectBits > 28)
+			//	dFitness += 10.0;
+			//else
 				dFitness += (20.0 / OUTPUTS_COUNT / (nBitWidth * nBitWidth) * (nCorrectBits * nCorrectBits));
 		}
 	}
@@ -270,6 +278,14 @@ bool CSigmoidFramework::EvaluateStopCondition(UINT nGeneration)
 			
 				return true;
 			}
+		}
+		else if (nGeneration % 10000 == 0)
+		{
+			m_strEvoParams.strSimulParams.bPrintInfo = true;
+			m_strEvoParams.strSimulParams.bPrintDebug = true;
+			m_pBestIndivs[nBest]->EvaluateFitness(m_strEvoParams.strSimulParams);
+			m_strEvoParams.strSimulParams.bPrintDebug = false;
+			m_strEvoParams.strSimulParams.bPrintInfo = false;
 		}
 	}
 	

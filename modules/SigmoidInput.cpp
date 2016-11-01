@@ -4,7 +4,7 @@ CSigmoidInputModule::CSigmoidInputModule(REGISTER_TYPE ** pInputs, int nInsCount
 	: CMaxInputModule(pInputs, nInsCount, &nIndex, nTestSetsCount, pActTestSet), m_nIndex(nIndex)
 {
 	m_nInputCount = 0;
-	m_nOutputCount = 1;
+	m_nOutputCount = 2;
 }
 
 int CSigmoidInputModule::Execute(REGISTER_TYPE * pInputs, REGISTER_TYPE * pOutputs, UINT * pExecDelay)
@@ -19,6 +19,7 @@ int CSigmoidInputModule::Execute(REGISTER_TYPE * pInputs, REGISTER_TYPE * pOutpu
 	}
 	else {
 		pOutputs[0] = m_pInputs[*m_pActTestSet][m_nIndex];
+		pOutputs[1] = ~pOutputs[0];
 
 		if (m_bSetZero)
 			SetZero(false);

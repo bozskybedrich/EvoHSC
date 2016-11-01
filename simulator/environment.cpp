@@ -190,7 +190,7 @@ void CEnvironment::PrintOutputs()
 	for (int nOut = 0; nOut < m_nOutputsCount; nOut++) {
 		std::cerr << "Otuput " << nOut << std::endl;
 		for (strDynamicTimeVal * pVal = m_pRealOutputs[nOut]->GetFirst(); pVal; pVal = pVal->pSucc)
-			std::cerr << "Time: " << pVal->time << " Value: " << pVal->val << std::endl;
+			std::cerr << "Time: " << pVal->time << " Value: " << pVal->val << " (0x" << std::hex << pVal->val << std::dec << ")" << std::endl;
 		std::cerr << std::endl;
 	}
 }
