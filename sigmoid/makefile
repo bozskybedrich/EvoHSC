@@ -49,4 +49,4 @@ ${program}: ${OBJ}
 #	gcc ${OBJ} ${OPT} ${OPT_LINKER} -o ${outDir}/${program}
 
 ${tmpDir}/sigmoid.o: sigmoid.cpp
-	gcc sigmoid.cpp -c ${OPT} -o ${tmpDir}/ImageFilter.o
+	gcc sigmoid.cpp -c ${OPT} -o ${tmpDir}/sigmoid.o
