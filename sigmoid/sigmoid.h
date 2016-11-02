@@ -6,9 +6,9 @@ class CSigmoidIndiv : public CIndividual
 public:
 	//CSymRegIndiv(strArchitectureParams * pParams, CEnvironment * pEnv);
 	CSigmoidIndiv(CArchitecture * pArch, CEnvironment * pEnv, CFramework * pFramework, strIndividualParams * pIndivParams)
-		: CIndividual(pArch, pEnv, pFramework, pIndivParams) {}
+		: CIndividual(pArch, pEnv, pFramework, pIndivParams), m_errBits(0) {}
 	CSigmoidIndiv(std::string & sXml, CArchitecture * pArch, CEnvironment * pEnv, CFramework * pFramework, strArchitectureParams * pArchParams = NULL)
-		: CIndividual(sXml, pArch, pEnv, pFramework, pArchParams) {}
+		: CIndividual(sXml, pArch, pEnv, pFramework, pArchParams), m_errBits(0) {}
 	CSigmoidIndiv * Clone() { return new CSigmoidIndiv(*this); }
 
 	double EvaluateOutputs(CEnvironment * pEnv);
@@ -23,9 +23,10 @@ public:
 		} return GetFitness(eResultsFitness) < otherIndiv.GetFitness(eResultsFitness);
 	}
 	
-	//void PrintProgram();
-	//virtual void GenerateRandomProgram();
-	//virtual int PregenerateProgram();
+	REGISTER_TYPE GetErrBits() { return m_errBits; }
+
+protected:
+	REGISTER_TYPE m_errBits;
 };
 
 class CSigmoidFramework : public CFramework
@@ -35,9 +36,12 @@ public:
 		CEnvironment * pEnvironment,
 		strEvolutionParams & strEvoParams,
 		strIndividualParams & strIndivParams)
-		: CFramework(pArchitecture, pEnvironment, strEvoParams, strIndivParams) { m_bPrintInfo = true; }
+		: CFramework(pArchitecture, pEnvironment, strEvoParams, strIndivParams), m_errBits(0) { m_bPrintInfo = true; }
 	CIndividual * CreateNewIndividual() { return new CSigmoidIndiv(m_pArchitecture, m_pEnvironment, this, &m_strIndivParams); }
 	bool EvaluateStopCondition(UINT nGeneration);
 	void ResetAfterEval();
 	bool IsNextInputSet();
+	REGISTER_TYPE GetErrBits() { return m_errBits; }
+protected:
+	REGISTER_TYPE m_errBits;
 };

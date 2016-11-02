@@ -79,6 +79,10 @@ void test(double fCross, double fMut)
 
 	CEnvironment * pEnv = new CEnvironment(NULL, NULL, 1, 1, NULL);
 	
+	BYTE instModAllIn[] = {0x00, 0x00, 0x00, 0x1F};
+
+	BYTE iosModAllIn[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
 	BYTE instModAll[] = {0x00, 0x00, 0x1F, 0xFF};
 
 	BYTE iosModAll[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Input modules
@@ -129,7 +133,7 @@ void test(double fCross, double fMut)
 
 	BYTE instrNOP[] = { 0x00, 0x00, 0x00, 0x00 };
 	BYTE instrRST[] = { 0xFF, 0xFF, 0xFF, 0xFF };
-#define INSTR_COUNT (28)
+#define INSTR_COUNT (30)
 
 	CInstruction* arrInstrSet[INSTR_COUNT] = { 
 									new CInstruction(4, instMOVr1, true, std::string("MOVr1")),
@@ -162,7 +166,10 @@ void test(double fCross, double fMut)
 									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
 									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
 									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50)
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+
+									new CInstruction(4, instModAllIn, false, std::string("ALL_IN"), 1, iosModAllIn, 10),
+									new CInstruction(4, instModAllIn, false, std::string("ALL_IN"), 1, iosModAllIn, 10)
 	};
 	
 	strArchitectureParams archParams;
@@ -182,7 +189,7 @@ void test(double fCross, double fMut)
 		evoParams.strMutParams.fProbs[infoMutationReg] = 0;
 		evoParams.strMutParams.fProbs[infoMutationModule] = 0;
 
-		evoParams.strSimulParams.nMaxLogicTime = 200;
+		evoParams.strSimulParams.nMaxLogicTime = 300;
 				
 		strIndividualParams indivParams(10,5);
 		CSigmoidFramework * pFramework = new CSigmoidFramework(pArch, pEnv, evoParams, indivParams);
@@ -220,31 +227,59 @@ double CSigmoidIndiv::EvaluateOutputs(CEnvironment * pEnv)
 	}
 
 	std::sort(vecOuts.rbegin(), vecOuts.rend());
+	m_errBits = 0;
 
 	for (std::vector<REGISTER_TYPE>::iterator itOut = vecOuts.begin(); itOut != vecOuts.end(); itOut++)
 	{
-		if (*itOut == pOutputs[0][0/*itOut - vecOuts.begin()*/])
+		REGISTER_TYPE out = pOutputs[0][1/*itOut - vecOuts.begin()*/];
+		REGISTER_TYPE errBits = static_cast<CSigmoidFramework *>(m_pFramework)->GetErrBits();
+
+		if (*itOut == out)
 			dFitness += 100.0;
 		else
 		{
-			REGISTER_TYPE masked = (*itOut ^ pOutputs[0][0/*itOut - vecOuts.begin()*/]);
+			REGISTER_TYPE masked = (*itOut ^ out);
+			m_errBits = masked;
 			int nCorrectBits = 0;
 			int nBitWidth = sizeof(REGISTER_TYPE)*8;
 
+			bool bFavored = false;
+			bool bSomeBad = false;
 			for (int i = 0; i < nBitWidth; i++)
 			{
 				if ((masked & 0x1) == 0)
+				{
+					REGISTER_TYPE nBitPos = 1 << i;
+					if ((errBits & nBitPos) != 0)
+					{
+						if ((m_errBits & (nBitPos >> 1)) == 0 || (m_errBits & (nBitPos << 1)) == 0)
+							bFavored = true;
+						else
+							bSomeBad = true;
+					}
+					
 					nCorrectBits++;
+				}
 
 				masked >>= 1;
 			}
 
-			//if ((*itOut & 0x100) != 0)
-			//	nCorrectBits -= 5;
+			if (bFavored && !bSomeBad)
+			{
+				UINT nBestErrBitsCount = 0;
+				for (int i = 0; i < nBitWidth; i++)
+				{
+					nBestErrBitsCount += (errBits & 0x1);
+					errBits >>= 1;
+				}
+				
+				nCorrectBits = nBitWidth - nBestErrBitsCount - 1;
+			}
+
 			//if (nCorrectBits > 28)
 			//	dFitness += 10.0;
 			//else
-				dFitness += (20.0 / OUTPUTS_COUNT / (nBitWidth * nBitWidth) * (nCorrectBits * nCorrectBits));
+			dFitness += (20.0 / OUTPUTS_COUNT / (nBitWidth * nBitWidth) * (nCorrectBits * nCorrectBits));
 		}
 	}
 
@@ -260,6 +295,7 @@ bool CSigmoidFramework::EvaluateStopCondition(UINT nGeneration)
 	for (UINT nBest = 0; nBest < m_strEvoParams.nEliteSize; nBest++) {
 		//if (nGeneration == 1)
 		//	m_pBestIndivs[nBest]->EvaluateFitness(m_strEvoParams.strSimulParams);
+		double fitness = m_pBestIndivs[nBest]->GetFitness(eResultsFitness);
 		if (m_pBestIndivs[nBest]->GetFitness(eResultsFitness) >= 98) {
 			if (true) {
 				if (m_bPrintInfo) {
@@ -279,16 +315,25 @@ bool CSigmoidFramework::EvaluateStopCondition(UINT nGeneration)
 				return true;
 			}
 		}
-		else if (nGeneration % 10000 == 0)
+		else
 		{
-			m_strEvoParams.strSimulParams.bPrintInfo = true;
-			m_strEvoParams.strSimulParams.bPrintDebug = true;
-			m_pBestIndivs[nBest]->EvaluateFitness(m_strEvoParams.strSimulParams);
-			m_strEvoParams.strSimulParams.bPrintDebug = false;
-			m_strEvoParams.strSimulParams.bPrintInfo = false;
+			if (nGeneration > 1000 && nGeneration % 1000 == 1)
+				m_errBits |= static_cast<CSigmoidIndiv *>(m_pBestIndivs[nBest])->GetErrBits();
+
+			if (nGeneration % 10000 == 0)
+			{
+				m_strEvoParams.strSimulParams.bPrintInfo = true;
+				m_strEvoParams.strSimulParams.bPrintDebug = true;
+				m_pBestIndivs[nBest]->EvaluateFitness(m_strEvoParams.strSimulParams);
+				m_strEvoParams.strSimulParams.bPrintDebug = false;
+				m_strEvoParams.strSimulParams.bPrintInfo = false;
+			}
 		}
 	}
 	
+	if (nGeneration % 1000 == 0)
+		m_errBits = 0;
+
 	return false;
 }
 
