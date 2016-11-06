@@ -58,8 +58,8 @@ void GenerateIOs(REGISTER_TYPE ** &pInputs, REGISTER_TYPE ** &pOutputs, int & nS
 	pOutputs[0] = new REGISTER_TYPE[OUTPUTS_COUNT];
 	pOutputs[0][0] = 0xFFFFFE00;
 	pOutputs[0][1] = 0xFFFF01F0;
-	pOutputs[0][2] = (~pInputs[0][0] & pInputs[0][1] & ~pInputs[0][2] & ~pInputs[0][3] & ~pInputs[0][4]) |
-		(pInputs[0][1] & pInputs[0][2]) | (pInputs[0][2] & pInputs[0][3] & pInputs[0][4]);//0xFFE0F18C;
+	pOutputs[0][2] = /*(~pInputs[0][0] & pInputs[0][1] & ~pInputs[0][2] & ~pInputs[0][3] & ~pInputs[0][4]) |
+		(pInputs[0][1] & pInputs[0][2]) | (pInputs[0][2] & pInputs[0][3] & pInputs[0][4]);*/0xFFE0F18C;
 	pOutputs[0][3] = 0xFC1CCD6A;
 	pOutputs[0][4] = 0xC39AE9C0;
 }
@@ -85,19 +85,19 @@ void test(double fCross, double fMut)
 	BYTE iosModAllIn[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
 
 	BYTE instOneAnd[] = { 0x00, 0x00, 0x00, 0x20 };
-	BYTE iosOneAnd[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF };
+	BYTE iosOneAnd[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF };
 
 	BYTE instModAll[] = {0x00, 0x00, 0x1F, 0xFF};
 
 	BYTE iosModAll[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Input modules
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF, //ANDOR modules (x inputs, 1 fn select, 1 out)
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF/*,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF, //ANDOR modules (x inputs, 1 fn select, 1 out)
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF/*,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
@@ -160,17 +160,17 @@ void test(double fCross, double fMut)
 									new CInstruction(4, instrNOP, false, std::string("NOP")),
 									new CInstruction(4, instrRST, false, std::string("RST")),
 									
-									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
-									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
-									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
-									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
-									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 74),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 74),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 74),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 74),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 74),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 74),
 
 									new CInstruction(4, instModAllIn, false, std::string("ALL_IN"), 1, iosModAllIn, 10),
 									new CInstruction(4, instModAllIn, false, std::string("ALL_IN"), 1, iosModAllIn, 10)
@@ -259,26 +259,33 @@ double CSigmoidIndiv::EvaluateOutputs(CEnvironment * pEnv)
 
 			bool bFavored = false;
 			bool bSomeBad = false;
+			int nLowerWordCorrect = 0;
 			for (int i = 0; i < nBitWidth; i++)
 			{
 				if ((masked & 0x1) == 0)
 				{
-					REGISTER_TYPE nBitPos = 1 << i;
+					/*REGISTER_TYPE nBitPos = 1 << i;
 					if ((errBits & nBitPos) != 0)
 					{
 						if ((m_errBits & (nBitPos >> 1)) == 0 || (m_errBits & (nBitPos << 1)) == 0)
 							bFavored = true;
 						else
 							bSomeBad = true;
-					}
+					}*/
 					
-					nCorrectBits++;
+					if (i < nBitWidth / 2)
+					{
+						nCorrectBits++;
+						nLowerWordCorrect++;
+					}
+					else if (nLowerWordCorrect > ((nBitWidth / 2) * 9 / 10))
+						nCorrectBits++;
 				}
 
 				masked >>= 1;
 			}
 
-			if (bFavored && !bSomeBad)
+			/*if (bFavored && !bSomeBad)
 			{
 				UINT nBestErrBitsCount = 0;
 				for (int i = 0; i < nBitWidth; i++)
@@ -288,7 +295,7 @@ double CSigmoidIndiv::EvaluateOutputs(CEnvironment * pEnv)
 				}
 				
 				nCorrectBits = nBitWidth - nBestErrBitsCount - 1;
-			}
+			}*/
 
 			//if (nCorrectBits > 28)
 			//	dFitness += 10.0;
