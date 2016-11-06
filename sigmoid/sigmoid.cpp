@@ -58,7 +58,8 @@ void GenerateIOs(REGISTER_TYPE ** &pInputs, REGISTER_TYPE ** &pOutputs, int & nS
 	pOutputs[0] = new REGISTER_TYPE[OUTPUTS_COUNT];
 	pOutputs[0][0] = 0xFFFFFE00;
 	pOutputs[0][1] = 0xFFFF01F0;
-	pOutputs[0][2] = 0xFFE0F18C;
+	pOutputs[0][2] = (~pInputs[0][0] & pInputs[0][1] & ~pInputs[0][2] & ~pInputs[0][3] & ~pInputs[0][4]) |
+		(pInputs[0][1] & pInputs[0][2]) | (pInputs[0][2] & pInputs[0][3] & pInputs[0][4]);//0xFFE0F18C;
 	pOutputs[0][3] = 0xFC1CCD6A;
 	pOutputs[0][4] = 0xC39AE9C0;
 }
@@ -75,25 +76,28 @@ void test(double fCross, double fMut)
 	}
 
 	for (int i = 0; i < (MODULES_COUNT - INPUTS_COUNT); i++)
-		pModules[INPUTS_COUNT + i] = new CAndOr(2);
+		pModules[INPUTS_COUNT + i] = new CAndOr(4);
 
 	CEnvironment * pEnv = new CEnvironment(NULL, NULL, 1, 1, NULL);
 	
 	BYTE instModAllIn[] = {0x00, 0x00, 0x00, 0x1F};
 
-	BYTE iosModAllIn[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+	BYTE iosModAllIn[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09};
+
+	BYTE instOneAnd[] = { 0x00, 0x00, 0x00, 0x20 };
+	BYTE iosOneAnd[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF };
 
 	BYTE instModAll[] = {0x00, 0x00, 0x1F, 0xFF};
 
 	BYTE iosModAll[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // Input modules
-		0xFF, 0xFF, 0xC2, 0xFF, 0xFF, //ANDOR modules (x inputs, 1 fn select, 1 out)
-		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xC2, 0xFF, 0xFF/*,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF, //ANDOR modules (x inputs, 1 fn select, 1 out)
+		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF/*,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
@@ -156,17 +160,17 @@ void test(double fCross, double fMut)
 									new CInstruction(4, instrNOP, false, std::string("NOP")),
 									new CInstruction(4, instrRST, false, std::string("RST")),
 									
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 50),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
+									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 7),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 66),
 
 									new CInstruction(4, instModAllIn, false, std::string("ALL_IN"), 1, iosModAllIn, 10),
 									new CInstruction(4, instModAllIn, false, std::string("ALL_IN"), 1, iosModAllIn, 10)
@@ -184,7 +188,7 @@ void test(double fCross, double fMut)
 		strArchitectureSettings settings(MODULES_COUNT);
 		pArch->SetArchSettings(&settings);
 
-		strEvolutionParams evoParams(50, 1000000, 0.01, 0.7,/*fCross, 0.1*prob,*/
+		strEvolutionParams evoParams(50, 1000000, 0.1, 0.7,/*fCross, 0.1*prob,*/
 			1);
 		evoParams.strMutParams.fProbs[infoMutationReg] = 0;
 		evoParams.strMutParams.fProbs[infoMutationModule] = 0;
@@ -193,6 +197,16 @@ void test(double fCross, double fMut)
 				
 		strIndividualParams indivParams(10,5);
 		CSigmoidFramework * pFramework = new CSigmoidFramework(pArch, pEnv, evoParams, indivParams);
+
+		/*CSigmoidIndiv tmpIndiv(pArch, pEnv, pFramework, &indivParams);
+		std::ifstream inFile("d:\\EvoHSC\\x64\\Debug\\indiv_out_32AAB040.xml");
+		std::stringstream buffer;
+		buffer << inFile.rdbuf();
+		std::string sXml = buffer.str();
+		inFile.close();
+		tmpIndiv.Parse(sXml);
+		tmpIndiv.EvaluateFitness(evoParams.strSimulParams);*/
+
 		pFramework->StartEvolution();
 		delete pFramework;
 		delete pArch;
@@ -231,7 +245,7 @@ double CSigmoidIndiv::EvaluateOutputs(CEnvironment * pEnv)
 
 	for (std::vector<REGISTER_TYPE>::iterator itOut = vecOuts.begin(); itOut != vecOuts.end(); itOut++)
 	{
-		REGISTER_TYPE out = pOutputs[0][1/*itOut - vecOuts.begin()*/];
+		REGISTER_TYPE out = pOutputs[0][2/*itOut - vecOuts.begin()*/];
 		REGISTER_TYPE errBits = static_cast<CSigmoidFramework *>(m_pFramework)->GetErrBits();
 
 		if (*itOut == out)
@@ -284,6 +298,16 @@ double CSigmoidIndiv::EvaluateOutputs(CEnvironment * pEnv)
 	}
 
 	return dFitness;
+}
+
+int CSigmoidIndiv::PregenerateProgram()
+{
+	BYTE pAllIn[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09 };
+	BYTE * pIOs = new BYTE[10];
+	memcpy(pIOs, pAllIn, 10);
+	AppendInstrBlock(INSTR_COUNT - 1, 0, pIOs);
+	
+	return 1;
 }
 
 bool CSigmoidFramework::EvaluateStopCondition(UINT nGeneration)

@@ -24,6 +24,7 @@ public:
 	}
 	
 	REGISTER_TYPE GetErrBits() { return m_errBits; }
+	int PregenerateProgram();
 
 protected:
 	REGISTER_TYPE m_errBits;
