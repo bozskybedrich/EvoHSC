@@ -9,10 +9,10 @@
 #include <fstream>
 #include <algorithm>
 
-#define SAMPLES_COUNT	(32)
+#define SAMPLES_COUNT	(24)
 #define INPUTS_COUNT	2
 #define OUTPUTS_COUNT	1
-#define MODULES_COUNT	24	// 2xInput, 19x8ANDOR
+#define MODULES_COUNT	8	// 2xInput, 2xMULT, 2xADD, 2xBITSHIFT
 
 REGISTER_TYPE ** pInputs;
 REGISTER_TYPE ** pOutputs;
@@ -53,7 +53,7 @@ void GenerateIOs(REGISTER_TYPE ** &pInputs, REGISTER_TYPE ** &pOutputs, int & nS
 	{
 		pInputs[i] = new REGISTER_TYPE[INPUTS_COUNT];
 		pInputs[i][0] = i*0x8;
-		pInputs[i][1] = 0x40;
+		pInputs[i][1] = 0x20;//0x40;
 
 		pOutputs[i] = new REGISTER_TYPE[OUTPUTS_COUNT];
 		double dOut = 1.0 / (1 + pow(M_E, -i*0.125));
@@ -81,17 +81,17 @@ void test(double fCross, double fMut)
 		pModules[i] = new CSigmoidInputModule(pInputs, INPUTS_COUNT, i, nTestSetsCount, &nActTestSet);
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 2; i++)
 		pModules[INPUTS_COUNT + i] = new CMultiplier(6);
 
-	for (int i = 0; i < 4; i++)
-		pModules[INPUTS_COUNT + 4 + i] = new CBitShifter();
+	for (int i = 0; i < 2; i++)
+		pModules[INPUTS_COUNT + 2 + i] = new CBitShifter();
 
-	for (int i = 0; i < 4; i++)
-		pModules[INPUTS_COUNT + 8 + i] = new CAdder();
+	for (int i = 0; i < 2; i++)
+		pModules[INPUTS_COUNT + 4 + i] = new CAdder();
 
-	for (int i = 0; i < (MODULES_COUNT - INPUTS_COUNT - 12); i++)
-		pModules[INPUTS_COUNT + 12 + i] = new CAndOr(5);
+	/*for (int i = 0; i < (MODULES_COUNT - INPUTS_COUNT - 12); i++)
+		pModules[INPUTS_COUNT + 12 + i] = new CAndOr(5);*/
 
 	CEnvironment * pEnv = new CEnvironment(NULL, NULL, 1, 1, NULL);
 	
@@ -102,31 +102,15 @@ void test(double fCross, double fMut)
 	//BYTE instOneAnd[] = { 0x00, 0x00, 0x00, 0x20 };
 	//BYTE iosOneAnd[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF };
 
-	BYTE instModAll[] = {0x00, 0xFF, 0xFF, 0xFF};
+	BYTE instModAll[] = {0x00, 0x00, 0x00, 0xFF};
 
 	BYTE iosModAll[] = {0xFF, 0xFF, 0xFF, 0xFF, // Input modules
 		0xFF, 0xFF, 0xFF, // Multiplers
 		0xFF, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, // Bit-shifters
-		0xFF, 0xFF, 0xFF, 0xFF, 
-		0xFF, 0xFF, 0xFF, 0xFF, 
-		0xFF, 0xFF, 0xFF, 0xFF, 
-		0xFF, 0xFF, 0xFF, 0xFF, // Adders
-		0xFF, 0xFF, 0xFF, 0xFF, 
-		0xFF, 0xFF, 0xFF, 0xFF, 
-		0xFF, 0xFF, 0xFF, 0xFF, 
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF, // AndOrs
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF,
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF, 0xFF/*,
+		0xFF, 0xC8, 0xC2, 0xFF, // Bit-shifters
+		0xFF, 0xC8, 0xC2, 0xFF, 
+		0xFF, 0xFF, 0xC4, 0xFF, // Adders
+		0xFF, 0xFF, 0xC4, 0xFF/*,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
 		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC2, 0xFF,
@@ -166,40 +150,40 @@ void test(double fCross, double fMut)
 
 	BYTE instrNOP[] = { 0x00, 0x00, 0x00, 0x00 };
 	BYTE instrRST[] = { 0xFF, 0xFF, 0xFF, 0xFF };
-#define INSTR_COUNT (25)
+#define INSTR_COUNT (16)
 
 	CInstruction* arrInstrSet[INSTR_COUNT] = { 
 									new CInstruction(4, instMOVr1, true, std::string("MOVr1")),
 									new CInstruction(4, instMOVr2, true, std::string("MOVr2")),
 									new CInstruction(4, instMOVr3, true, std::string("MOVr3")),
 									new CInstruction(4, instMOVr4, true, std::string("MOVr4")),
-									new CInstruction(4, instMOVr5, true, std::string("MOVr5")),
-									new CInstruction(4, instMOVr6, true, std::string("MOVr6")),
+									//new CInstruction(4, instMOVr5, true, std::string("MOVr5")),
+									//new CInstruction(4, instMOVr6, true, std::string("MOVr6")),
 
 									new CInstruction(4, instrOUTr1, true, std::string("OUTr0")),
 									new CInstruction(4, instrOUTr2, true, std::string("OUTr1")),
 									new CInstruction(4, instrOUTr3, true, std::string("OUTr2")),
 									new CInstruction(4, instrOUTr4, true, std::string("OUTr3")),
-									new CInstruction(4, instrOUTr5, true, std::string("OUTr4")),
-									new CInstruction(4, instrOUTr6, true, std::string("OUTr5")),
-									new CInstruction(4, instrOUTr7, true, std::string("OUTr6")),
-									new CInstruction(4, instrOUTr8, true, std::string("OUTr7")),
-									new CInstruction(4, instrOUTr9, true, std::string("OUTr8")),
+									//new CInstruction(4, instrOUTr5, true, std::string("OUTr4")),
+									//new CInstruction(4, instrOUTr6, true, std::string("OUTr5")),
+									//new CInstruction(4, instrOUTr7, true, std::string("OUTr6")),
+									//new CInstruction(4, instrOUTr8, true, std::string("OUTr7")),
+									//new CInstruction(4, instrOUTr9, true, std::string("OUTr8")),
 
-									new CInstruction(4, instrNOP, false, std::string("NOP")),
-									new CInstruction(4, instrRST, false, std::string("RST")),
+									//new CInstruction(4, instrNOP, false, std::string("NOP")),
+									//new CInstruction(4, instrRST, false, std::string("RST")),
 									
 									/*new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
 									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
 									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
 									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),
 									new CInstruction(4, instOneAnd, false, std::string("ONE"), 1, iosOneAnd, 8),*/
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 128),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 128),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 128),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 128),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 128),
-									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 128),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 26),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 26),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 26),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 26),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 26),
+									new CInstruction(4, instModAll, false, std::string("ALL"), 1, iosModAll, 26),
 
 									new CInstruction(4, instModAllIn, false, std::string("ALL_IN"), 1, iosModAllIn, 4),
 									new CInstruction(4, instModAllIn, false, std::string("ALL_IN"), 1, iosModAllIn, 4)
@@ -207,17 +191,17 @@ void test(double fCross, double fMut)
 	
 	strArchitectureParams archParams;
 	archParams.nMaxModulesCount = MODULES_COUNT;
-	archParams.nMaxRegistersCount = 10;
+	archParams.nMaxRegistersCount = 4;
 	archParams.pAllowedInstructions = arrInstrSet;
 	archParams.pAllowedModules = pModules;
 	
 	bool bDynamic = true;
 	for (UINT i = 0; i < 50; i++) {
-		CArchitecture * pArch = new CArchitecture(10, (REGISTER_TYPE) 0xFFFFFFFF, MODULES_COUNT, pModules, INSTR_COUNT, arrInstrSet, &archParams, bDynamic);
+		CArchitecture * pArch = new CArchitecture(4, (REGISTER_TYPE) 0xFFFFFFFF, MODULES_COUNT, pModules, INSTR_COUNT, arrInstrSet, &archParams, bDynamic);
 		strArchitectureSettings settings(MODULES_COUNT);
 		pArch->SetArchSettings(&settings);
 
-		strEvolutionParams evoParams(50, 1000000, 0.1, 0.7,/*fCross, 0.1*prob,*/
+		strEvolutionParams evoParams(10, 200000, 0.1, 0.7,/*fCross, 0.1*prob,*/
 			1);
 		evoParams.strMutParams.fProbs[infoMutationReg] = 0;
 		evoParams.strMutParams.fProbs[infoMutationModule] = 0;
@@ -277,8 +261,8 @@ double CSigmoidSecOrdIndiv::EvaluateOutputs(CEnvironment * pEnv)
 			dFitness += (100.0 / SAMPLES_COUNT);
 		else
 		{
-			double dDiff = abs(*itOut - out);
-			dFitness += (100.0 / SAMPLES_COUNT) / (1 + dDiff);
+			double dDiff = abs(*itOut - out) / 2.0;
+			dFitness += (100.0 / SAMPLES_COUNT) / pow(1 + dDiff, 2);
 		}
 	}
 
@@ -306,7 +290,7 @@ bool CSigmoidSecOrdFramework::EvaluateStopCondition(UINT nGeneration)
 		//if (nGeneration == 1)
 		//	m_pBestIndivs[nBest]->EvaluateFitness(m_strEvoParams.strSimulParams);
 		double fitness = m_pBestIndivs[nBest]->GetFitness(eResultsFitness);
-		if (m_pBestIndivs[nBest]->GetFitness(eResultsFitness) >= 98) {
+		if (m_pBestIndivs[nBest]->GetFitness(eResultsFitness) >= 68) {
 			if (true) {
 				if (m_bPrintInfo) {
 					m_pBestIndivs[nBest]->PrintProgram();
@@ -335,6 +319,9 @@ bool CSigmoidSecOrdFramework::EvaluateStopCondition(UINT nGeneration)
 				m_strEvoParams.strSimulParams.bPrintDebug = false;
 				m_strEvoParams.strSimulParams.bPrintInfo = false;
 			}
+
+			if (nGeneration > 20000 && m_pBestIndivs[nBest]->GetFitness(eResultsFitness) < 20)
+				return true;
 		}
 	}
 	
