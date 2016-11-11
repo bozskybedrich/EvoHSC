@@ -4,7 +4,7 @@ tmpDir=temp
 program=sigmoid_plan
 
 # Seznam objektových souboru použijeme na dvou místech.
-OBJ=${tmpDir}/sigmoid_sec_ord.o
+OBJ=${tmpDir}/sigmoid_plan.o
 
 # Míra optimalizace prekladace gcc
 #OPT=-I ../tinyxml -I ../simulator -I ../framework -ggdb3 -m32
